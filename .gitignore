@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Build & test artifacts
+dist/
+coverage/
+
+# Local database
+dev.db
+
+# Prisma generated client
+node_modules/.prisma/

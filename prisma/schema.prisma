@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  // Address is crucial for tax calculation - stored as JSON string in SQLite
+  address   String     
+  region    String   @default("US") // US, EU, IN
+  currency  String   @default("USD")
+  balance   Int      @default(0) // Credit balance in cents
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+  invoices      Invoice[]
+  user          User?
+  requests      SubscriptionRequest[]
+  payments      Payment[]
+
+  @@map("customers")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   // Enum: ADMIN, CUSTOMER
+  customerId String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer  Customer? @relation(fields: [customerId], references: [id])
+
+  @@map("users")
+}
+
+model SubscriptionRequest {
+  id             String   @id @default(uuid())
+  customerId     String
+  planId         String
+  status         String   // Enum: PENDING, APPROVED, REJECTED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  customer       Customer @relation(fields: [customerId], references: [id])
+  plan           Plan     @relation(fields: [planId], references: [id])
+
+  @@map("subscription_requests")
+}
+
+model Plan {
+  id        String   @id // e.g. "pro-monthly-usd"
+  name      String
+  interval  String   // Enum: MONTH, YEAR
+  currency  String
+  amount    Int      // In smallest currency unit (e.g., cents)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+  requests      SubscriptionRequest[]
+  
+  @@map("plans")
+}
+
+model Subscription {
+  id                 String             @id @default(uuid())
+  customerId         String
+  planId             String
+  status             String             // Enum: ACTIVE, CANCELED, PAST_DUE, PENDING
+  
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  
+  cancelAtPeriodEnd  Boolean            @default(false)
+  canceledAt         DateTime?
+  
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  customer           Customer           @relation(fields: [customerId], references: [id])
+  plan               Plan               @relation(fields: [planId], references: [id])
+  invoices           Invoice[]
+
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  customerId     String
+  subscriptionId String?
+  
+  amount         Int           // Total amount including tax
+  subtotal       Int           // Amount before tax
+  tax            Int           // Tax amount
+  currency       String
+  
+  status         String        // Enum: DRAFT, OPEN, PAID, VOID, UNCOLLECTIBLE
+  billingReason  String        // Enum: SUBSCRIPTION_CREATE, SUBSCRIPTION_CYCLE, SUBSCRIPTION_UPDATE
+  
+  date           DateTime      // Issue date
+  dueDate        DateTime
+  paidAt         DateTime?
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  items          InvoiceItem[]
+  payments       Payment[]
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String          @id @default(uuid())
+  invoiceId   String
+  
+  amount      Int
+  currency    String
+  description String
+  
+  type        String          // Enum: BASE, TAX, PRORATION, SUBSCRIPTION
+  
+  // For proration
+  periodStart DateTime?
+  periodEnd   DateTime?
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  invoice     Invoice         @relation(fields: [invoiceId], references: [id])
+
+  @@map("invoice_items")
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  customerId  String
+  invoiceId   String   @unique
+  amount      Int      // In smallest currency unit (e.g., cents)
+  createdAt   DateTime @default(now())
+
+  customer    Customer @relation(fields: [customerId], references: [id])
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+
+  @@map("payments")
+}
