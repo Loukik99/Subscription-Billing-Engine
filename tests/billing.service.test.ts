@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { BillingService } from '../src/billing/billing.service';
 import prisma from '../src/db/prisma';
 import { SubscriptionStatus, PlanInterval, BillingReason } from '../src/types';
@@ -67,7 +68,7 @@ describe('BillingService', () => {
       const subId = 'sub_due';
       const plan = {
           id: 'plan_1',
-          amount: 1000,
+          amount: new Prisma.Decimal(1000),
           currency: 'USD',
           interval: PlanInterval.MONTH,
           name: 'Pro Plan'

@@ -2,7 +2,7 @@ import { addMonths } from 'date-fns';
 import { SubscriptionService } from '../src/subscriptions/subscriptions.service';
 import prisma from '../src/db/prisma';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { PlanInterval, SubscriptionStatus } from '../src/types';
 
 jest.mock('../src/db/prisma', () => {
@@ -38,7 +38,7 @@ describe('SubscriptionService', () => {
       name: 'Test',
       address: '{"country":"US","state":"NY"}',
       region: 'US', // Added missing region field
-      balance: 0,
+      balance: new Prisma.Decimal(0),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -47,7 +47,7 @@ describe('SubscriptionService', () => {
       name: 'Pro Monthly',
       interval: PlanInterval.MONTH,
       currency: 'USD',
-      amount: 1000,
+      amount: new Prisma.Decimal(1000),
       active: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -161,8 +161,8 @@ describe('SubscriptionService', () => {
        const oldPlanId = 'plan_a';
        const newPlanId = 'plan_b';
        
-       const oldPlan = { id: oldPlanId, amount: 1000, currency: 'USD', interval: PlanInterval.MONTH, name: 'Plan A', active: true, createdAt: new Date(), updatedAt: new Date() };
-       const newPlan = { id: newPlanId, amount: 2000, currency: 'USD', interval: PlanInterval.MONTH, name: 'Plan B', active: true, createdAt: new Date(), updatedAt: new Date() };
+       const oldPlan = { id: oldPlanId, amount: new Prisma.Decimal(1000), currency: 'USD', interval: PlanInterval.MONTH, name: 'Plan A', active: true, createdAt: new Date(), updatedAt: new Date() };
+       const newPlan = { id: newPlanId, amount: new Prisma.Decimal(2000), currency: 'USD', interval: PlanInterval.MONTH, name: 'Plan B', active: true, createdAt: new Date(), updatedAt: new Date() };
        
        const subscription = {
          id: subscriptionId,

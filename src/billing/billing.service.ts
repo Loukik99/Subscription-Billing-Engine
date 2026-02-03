@@ -1,5 +1,6 @@
 import { addMonths, addYears } from 'date-fns';
 import prisma from '../db/prisma';
+import { Prisma } from '@prisma/client';
 import { SubscriptionStatus, PlanInterval, InvoiceItemType, BillingReason } from '../types';
 import { TaxService, SimpleTaxProvider } from '../tax/tax.service';
 import { TaxRequest } from '../tax/tax.types';
@@ -123,7 +124,7 @@ export class BillingService {
           }
           
           const taxRequest: TaxRequest = {
-            amount: subscription.plan.amount,
+            amount: subscription.plan.amount.toNumber(),
             currency: subscription.plan.currency,
             customerAddress: {
               country: address?.country || 'US',
@@ -135,6 +136,8 @@ export class BillingService {
           const taxResult = await this.taxService.calculateTax(taxRequest);
           const taxAmount = taxResult.totalTaxAmount;
 
+          const planAmount = (subscription.plan.amount as unknown as Prisma.Decimal).toNumber();
+
           const invoice = await tx.invoice.create({
             data: {
               customerId: subscription.customerId,
@@ -144,7 +147,7 @@ export class BillingService {
               billingReason: billingReason,
               date: new Date(),
               dueDate: new Date(),
-              amount: subscription.plan.amount + taxAmount,
+              amount: planAmount + taxAmount,
               subtotal: subscription.plan.amount,
               tax: taxAmount,
               items: {

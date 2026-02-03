@@ -2,7 +2,7 @@ import { SubscriptionService } from '../src/subscriptions/subscriptions.service'
 import { ProrationService } from '../src/billing/proration.service';
 import prisma from '../src/db/prisma';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { PlanInterval, SubscriptionStatus } from '../src/types';
 import BigNumber from 'bignumber.js';
 
@@ -42,7 +42,7 @@ describe('ProrationService', () => {
       name: 'Basic',
       interval: PlanInterval.MONTH,
       currency: 'USD',
-      amount: 1000, // $10.00
+      amount: new Prisma.Decimal(1000), // $10.00
       active: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -51,7 +51,7 @@ describe('ProrationService', () => {
     const newPlan = {
       ...currentPlan,
       id: 'pro',
-      amount: 2000, // $20.00
+      amount: new Prisma.Decimal(2000), // $20.00
     };
 
     const subscription = {
@@ -104,7 +104,7 @@ describe('ProrationService', () => {
       name: 'Pro',
       interval: PlanInterval.MONTH,
       currency: 'USD',
-      amount: 2000, // $20.00
+      amount: new Prisma.Decimal(2000), // $20.00
       active: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -113,7 +113,7 @@ describe('ProrationService', () => {
     const newPlan = {
       ...currentPlan,
       id: 'basic',
-      amount: 1000, // $10.00
+      amount: new Prisma.Decimal(1000), // $10.00
     };
 
     const subscription = {
@@ -154,13 +154,13 @@ describe('ProrationService', () => {
        name: 'Basic',
        interval: PlanInterval.MONTH,
        currency: 'USD',
-       amount: 1000,
+       amount: new Prisma.Decimal(1000),
        active: true,
        createdAt: new Date(),
        updatedAt: new Date(),
      };
 
-     const newPlan = { ...currentPlan, id: 'pro', amount: 2000 };
+     const newPlan = { ...currentPlan, id: 'pro', amount: new Prisma.Decimal(2000) };
 
      const subscription = {
        id: 'sub_1',

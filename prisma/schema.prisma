@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -14,11 +14,11 @@ model Customer {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String
-  // Address is crucial for tax calculation - stored as JSON string in SQLite
-  address   String     
+  // Address is crucial for tax calculation
+  address   Json     
   region    String   @default("US") // US, EU, IN
   currency  String   @default("USD")
-  balance   Int      @default(0) // Credit balance in cents
+  balance   Decimal  @default(0) // Credit balance
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -64,7 +64,7 @@ model Plan {
   name      String
   interval  String   // Enum: MONTH, YEAR
   currency  String
-  amount    Int      // In smallest currency unit (e.g., cents)
+  amount    Decimal  // In major currency unit (e.g., 10.00)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,9 +102,9 @@ model Invoice {
   customerId     String
   subscriptionId String?
   
-  amount         Int           // Total amount including tax
-  subtotal       Int           // Amount before tax
-  tax            Int           // Tax amount
+  amount         Decimal       // Total amount including tax
+  subtotal       Decimal       // Amount before tax
+  tax            Decimal       // Tax amount
   currency       String
   
   status         String        // Enum: DRAFT, OPEN, PAID, VOID, UNCOLLECTIBLE
@@ -129,7 +129,7 @@ model InvoiceItem {
   id          String          @id @default(uuid())
   invoiceId   String
   
-  amount      Int
+  amount      Decimal
   currency    String
   description String
   
@@ -151,7 +151,7 @@ model Payment {
   id          String   @id @default(uuid())
   customerId  String
   invoiceId   String   @unique
-  amount      Int      // In smallest currency unit (e.g., cents)
+  amount      Decimal  // In major currency unit
   createdAt   DateTime @default(now())
 
   customer    Customer @relation(fields: [customerId], references: [id])

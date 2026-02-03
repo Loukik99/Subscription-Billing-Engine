@@ -1,4 +1,5 @@
 import prisma from '../db/prisma';
+import { Prisma } from '@prisma/client';
 
 export class DashboardService {
   async getSummary() {
@@ -63,7 +64,8 @@ export class DashboardService {
     periodPayments.forEach((p) => {
       const dateStr = p.createdAt.toISOString().split('T')[0];
       if (revenueMap.has(dateStr)) {
-        revenueMap.set(dateStr, (revenueMap.get(dateStr) || 0) + p.amount);
+        const amount = (p.amount as unknown as Prisma.Decimal).toNumber();
+        revenueMap.set(dateStr, (revenueMap.get(dateStr) || 0) + amount);
       }
     });
 
@@ -72,11 +74,14 @@ export class DashboardService {
       .map(([date, amount]) => ({ date, amount }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
+    const totalRevenue = billedInvoices._sum.amount ? (billedInvoices._sum.amount as unknown as Prisma.Decimal).toNumber() : 0;
+    const collectedRevenueAmount = collectedRevenue._sum.amount ? (collectedRevenue._sum.amount as unknown as Prisma.Decimal).toNumber() : 0;
+
     return {
       activeSubscriptions,
       pendingInvoices,
-      totalRevenue: billedInvoices._sum.amount || 0, // Now represents OPEN invoices
-      collectedRevenue: collectedRevenue._sum.amount || 0, // Now represents PAYMENTS
+      totalRevenue, // Now represents OPEN invoices
+      collectedRevenue: collectedRevenueAmount, // Now represents PAYMENTS
       recentInvoices,
       revenueHistory,
     };

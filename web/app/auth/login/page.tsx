@@ -87,6 +87,10 @@ function LoginForm() {
           </div>
 
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+          
+          <div className="mt-4 text-center text-xs text-gray-400">
+            API: {process.env.NEXT_PUBLIC_API_URL || 'Default (localhost)'}
+          </div>
 
           <div>
             <button

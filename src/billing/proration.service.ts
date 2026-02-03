@@ -48,11 +48,11 @@ export class ProrationService {
     const remainingRatio = remainingDuration.dividedBy(totalDuration); 
 
     // 1. Unused portion of current plan (Credit)
-    const currentPlanAmount = new BigNumber(currentSubscription.plan.amount);
+    const currentPlanAmount = new BigNumber(currentSubscription.plan.amount.toString());
     const unusedCurrentValue = currentPlanAmount.multipliedBy(remainingRatio);
     
     // 2. Cost of new plan for remaining period (Charge)
-    const newPlanAmount = new BigNumber(newPlan.amount);
+    const newPlanAmount = new BigNumber(newPlan.amount.toString());
     const costForRemainingPeriod = newPlanAmount.multipliedBy(remainingRatio);
 
     // 3. Round components first to ensure invoice consistency

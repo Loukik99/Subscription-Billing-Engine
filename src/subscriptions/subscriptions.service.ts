@@ -122,11 +122,14 @@ export class SubscriptionService {
       
       const percentRemaining = remainingDuration / totalDuration;
       
+      const planAmount = (subscription.plan.amount as unknown as Prisma.Decimal).toNumber();
+      const newPlanAmountVal = (newPlan.amount as unknown as Prisma.Decimal).toNumber();
+
       // Credit for Old Plan (Negative amount)
-      const unusedAmount = -1 * Math.round(subscription.plan.amount * percentRemaining);
+      const unusedAmount = -1 * Math.round(planAmount * percentRemaining);
       
       // Charge for New Plan (Positive amount)
-      const remainingAmount = Math.round(newPlan.amount * percentRemaining);
+      const remainingAmount = Math.round(newPlanAmountVal * percentRemaining);
       
       const netAmount = unusedAmount + remainingAmount;
       

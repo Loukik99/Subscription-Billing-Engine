@@ -46,9 +46,9 @@ async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<
     if (error instanceof ApiError) {
       throw error;
     }
-    console.error(`Network error fetching ${endpoint}:`, error);
+    console.error(`Network error fetching ${API_URL}${endpoint}:`, error);
     // Return a rejected promise with a clearer error message for the UI to handle
-    throw new Error('Network error: Unable to connect to the server. Please ensure the backend is running.');
+    throw new Error(`Network error: Unable to connect to server at ${API_URL}. Please ensure the backend is deployed and NEXT_PUBLIC_API_URL is set.`);
   }
 }
 

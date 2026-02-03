@@ -1,5 +1,5 @@
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { SimpleTaxProvider } from './src/tax/tax.service';
 
 const prisma = new PrismaClient();
@@ -39,7 +39,7 @@ async function main() {
     } catch (e) { address = {}; }
 
     const taxResult = await taxProvider.calculateTax({
-        amount: plan.amount,
+        amount: (plan.amount as unknown as Prisma.Decimal).toNumber(),
         currency: plan.currency,
         customerAddress: {
             country: address?.country || 'US',
@@ -48,18 +48,18 @@ async function main() {
         }
     });
 
-    const expectedTotal = plan.amount + taxResult.totalTaxAmount;
+    const expectedTotal = (plan.amount as unknown as Prisma.Decimal).toNumber() + taxResult.totalTaxAmount;
 
     // Check discrepancy
-    if (inv.amount !== expectedTotal) {
+    if ((inv.amount as unknown as Prisma.Decimal).toNumber() !== expectedTotal) {
         console.log(`Mismatch Invoice ${inv.id} (Date: ${inv.date.toISOString().split('T')[0]})`);
-        console.log(`  - Plan: ${plan.name} (${plan.amount})`);
+        console.log(`  - Plan: ${plan.name} (${(plan.amount as unknown as Prisma.Decimal).toNumber()})`);
         console.log(`  - Expected: ${expectedTotal} (Tax: ${taxResult.totalTaxAmount})`);
-        console.log(`  - Actual:   ${inv.amount}`);
-        console.log(`  - Diff:     ${inv.amount - expectedTotal}`);
+        console.log(`  - Actual:   ${(inv.amount as unknown as Prisma.Decimal).toNumber()}`);
+        console.log(`  - Diff:     ${(inv.amount as unknown as Prisma.Decimal).toNumber() - expectedTotal}`);
         
         // Flag very high inflation
-        if (inv.amount > expectedTotal * 2) {
+        if ((inv.amount as unknown as Prisma.Decimal).toNumber() > expectedTotal * 2) {
              console.log(`  !!! CRITICAL INFLATION DETECTED !!!`);
         }
     }

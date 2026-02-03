@@ -1,4 +1,5 @@
 import prisma from '../db/prisma';
+import { Prisma } from '@prisma/client';
 
 export class CustomersService {
   async getCustomers() {
@@ -14,7 +15,8 @@ export class CustomersService {
 
     const balanceMap = new Map<string, number>();
     balances.forEach(b => {
-      balanceMap.set(b.customerId, b._sum.amount || 0);
+      const amount = b._sum.amount ? (b._sum.amount as unknown as Prisma.Decimal).toNumber() : 0;
+      balanceMap.set(b.customerId, amount);
     });
 
     return customers.map(c => ({
@@ -41,9 +43,11 @@ export class CustomersService {
       where: { customerId: id },
     });
 
+    const balance = paymentAgg._sum.amount ? (paymentAgg._sum.amount as unknown as Prisma.Decimal).toNumber() : 0;
+
     return {
       ...customer,
-      balance: paymentAgg._sum.amount || 0
+      balance
     };
   }
 
