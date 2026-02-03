@@ -32,3 +32,4 @@ export function formatDate(date: string | Date | null | undefined) {
     day: 'numeric',
   });
 }
+

@@ -26,3 +26,4 @@ export function LogoutButton({ className }: { className?: string }) {
     </button>
   );
 }
+

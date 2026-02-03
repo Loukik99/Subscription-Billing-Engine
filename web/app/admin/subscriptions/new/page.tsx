@@ -163,7 +163,7 @@ function NewSubscriptionContent() {
                       <p className="text-sm text-gray-500">{customer.email}</p>
                     </div>
                     <div className="text-sm text-gray-500">
-                      {customer.region} • {customer.currency}
+                      {customer.region} â€¢ {customer.currency}
                     </div>
                   </div>
                 </li>
@@ -254,3 +254,4 @@ export default function NewSubscriptionPage() {
     </Suspense>
   );
 }
+
