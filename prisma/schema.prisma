@@ -152,6 +152,7 @@ model Payment {
   customerId  String
   invoiceId   String   @unique
   amount      Decimal  // In major currency unit
+  status      String   @default("SUCCESS") // SUCCESS, FAILED
   createdAt   DateTime @default(now())
 
   customer    Customer @relation(fields: [customerId], references: [id])
