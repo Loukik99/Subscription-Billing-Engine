@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { login } from '@/lib/api';
 
 export default function LoginPage() {
@@ -40,9 +41,12 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold">
+        <h1 className="mb-2 text-center text-2xl font-bold">
           Sign in to your account
         </h1>
+        <p className="mb-6 text-center text-sm text-gray-600">
+          Or <Link href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">create a new account</Link>
+        </p>
 
         {error && (
           <div className="mb-4 rounded bg-red-100 p-3 text-red-700">
