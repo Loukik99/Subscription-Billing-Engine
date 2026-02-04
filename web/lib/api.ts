@@ -94,8 +94,6 @@ export const api = {
   getSystemStatus: () => fetcher<import('../types').SystemStatus>('/dashboard/system'),
 
   // Auth
-  register: (data: any) => fetcher<{ token: string; user: any }>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
-  login: (email: string, password: string) => fetcher<{ token: string; user: any }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
 
   // Portal
   getPortalDashboard: () => fetcher<any>('/portal/me'),
