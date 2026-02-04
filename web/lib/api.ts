@@ -104,3 +104,9 @@ export const api = {
   getPortalInvoice: (invoiceId: string) => fetcher<any>(`/portal/me/invoices/${invoiceId}`),
 };
 
+export const login = (credentials: { email: string; password: string }) =>
+  fetcher<{ token: string; user: any }>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  });
+
