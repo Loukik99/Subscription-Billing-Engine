@@ -16,8 +16,22 @@ export default function LoginPage() {
 
     try {
       const res = await login({ email, password });
-      localStorage.setItem("token", res.token);
-      router.push("/admin");
+      
+      // Store auth data
+      localStorage.setItem("auth_token", res.token);
+      if (res.user) {
+        localStorage.setItem("user_role", res.user.role);
+        if (res.user.customerId) {
+          localStorage.setItem("portal_customer_id", res.user.customerId);
+        }
+      }
+
+      // Redirect based on role
+      if (res.user?.role === 'ADMIN') {
+        router.push("/admin");
+      } else {
+        router.push("/portal/customer");
+      }
     } catch (err: any) {
       setError(err.message || "Login failed");
     }

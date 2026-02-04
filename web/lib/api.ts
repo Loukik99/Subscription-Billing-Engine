@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005/api';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005/api').replace(/\/$/, '');
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -8,6 +8,9 @@ export class ApiError extends Error {
 }
 
 async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  // Debug log to help troubleshoot configuration
+  console.log(`[API] Fetching ${endpoint} from ${API_URL}`);
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -38,7 +41,12 @@ async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<
           errorMessage = errorData.error || errorMessage;
         } else {
           const text = await res.text();
-          errorMessage = `Server Error (${res.status}): ${text.substring(0, 100) || res.statusText}`;
+          // Detect if response is HTML (likely Next.js 404 page due to wrong API_URL)
+          if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
+            errorMessage = `Configuration Error: API URL (${API_URL}) points to a web page, not the backend. Check NEXT_PUBLIC_API_URL.`;
+          } else {
+            errorMessage = `Server Error (${res.status}): ${text.substring(0, 100) || res.statusText}`;
+          }
         }
       } catch (e) {
         errorMessage = `Error parsing response (${res.status})`;
