@@ -29,8 +29,22 @@ async function fetcher<T>(endpoint: string, options: RequestInit = {}): Promise<
     });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new ApiError(res.status, errorData.error || 'An error occurred');
+      let errorMessage = 'An error occurred';
+      const contentType = res.headers.get('content-type') || '';
+      
+      try {
+        if (contentType.includes('application/json')) {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+        } else {
+          const text = await res.text();
+          errorMessage = `Server Error (${res.status}): ${text.substring(0, 100) || res.statusText}`;
+        }
+      } catch (e) {
+        errorMessage = `Error parsing response (${res.status})`;
+      }
+      
+      throw new ApiError(res.status, errorMessage);
     }
 
     const contentType = res.headers.get('content-type') || '';
