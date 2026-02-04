@@ -7,19 +7,19 @@ import { login } from '@/lib/api';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
     try {
-      const { token } = await login({ email, password });
-      localStorage.setItem('auth_token', token);
-      router.push('/admin');
-    } catch (err) {
-      setError('Invalid email or password');
+      const res = await login({ email, password });
+      localStorage.setItem("token", res.token);
+      router.push("/admin");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
     }
   };
 
@@ -66,7 +66,7 @@ export default function LoginPage() {
               className="focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
               type="submit"
             >
-              Sign In
+              Sign in
             </button>
           </div>
         </form>
