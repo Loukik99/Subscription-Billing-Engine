@@ -45,7 +45,7 @@ export default function LoginPage() {
           Sign in to your account
         </h1>
         <p className="mb-6 text-center text-sm text-gray-600">
-          Or <Link href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">create a new account</Link>
+          Or <Link href="/auth/register" className="font-medium text-indigo-600 hover:text-indigo-500">register as a new Customer</Link>
         </p>
 
         {error && (
