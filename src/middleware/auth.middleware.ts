@@ -37,5 +37,10 @@ export const requireRole = (role: string) => {
   };
 };
 
-export const requireAdmin = requireRole('ADMIN');
+export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  next();
+};
 export const requireCustomer = requireRole('CUSTOMER');
