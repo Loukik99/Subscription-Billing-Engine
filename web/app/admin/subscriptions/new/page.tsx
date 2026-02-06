@@ -60,14 +60,14 @@ function NewSubscriptionContent() {
     }
   };
 
+  const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+  const selectedPlan = plans.find(p => p.id === selectedPlanId);
+
   const filteredCustomers = customers.filter(c => 
     (c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (!selectedPlan || c.currency === selectedPlan.currency)
   );
-
-  const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
-  const selectedPlan = plans.find(p => p.id === selectedPlanId);
   
   // Filter plans by selected customer's currency
   const compatiblePlans = selectedCustomer 
