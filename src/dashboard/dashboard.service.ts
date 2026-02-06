@@ -11,7 +11,7 @@ export class DashboardService {
       where: { status: 'OPEN' },
     });
 
-    // Billed Revenue: Sum of OPEN invoices (Obligation)
+    // Billed Revenue: Sum ONLY invoices where status = 'OPEN'
     const billedInvoices = await prisma.invoice.aggregate({
       _sum: {
         amount: true,
@@ -19,11 +19,12 @@ export class DashboardService {
       where: { status: 'OPEN' },
     });
     
-    // Collected Revenue: Sum of PAYMENTS (Actual Cash)
+    // Collected Revenue: Sum ONLY payments where status = 'SUCCESS'
     const collectedRevenue = await prisma.payment.aggregate({
       _sum: {
         amount: true,
       },
+      where: { status: 'SUCCESS' },
     });
 
     const recentInvoices = await prisma.invoice.findMany({
@@ -43,6 +44,7 @@ export class DashboardService {
         createdAt: {
           gte: thirtyDaysAgo,
         },
+        status: 'SUCCESS',
       },
       select: {
         amount: true,

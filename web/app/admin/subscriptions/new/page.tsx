@@ -61,8 +61,9 @@ function NewSubscriptionContent() {
   };
 
   const filteredCustomers = customers.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    c.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (!selectedPlan || c.currency === selectedPlan.currency)
   );
 
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
