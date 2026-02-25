@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "jest",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts"
-  },
+ "scripts": {
+  "test": "jest",
+  "build": "prisma generate && tsc",
+  "start": "node dist/server.js",
+  "dev": "nodemon src/server.ts"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
